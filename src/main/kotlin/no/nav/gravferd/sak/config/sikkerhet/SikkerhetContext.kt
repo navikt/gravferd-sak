@@ -21,6 +21,8 @@ object SikkerhetContext {
 
     fun harRolle(rolle: Rolle): Boolean = hentAutentisering()?.authorities?.any { it.authority == rolle.authority() } == true
 
+    fun hentRoller(): Set<Rolle> = Rolle.entries.filter { harRolle(it) }.toSet()
+
     fun hentJwt(): Jwt? = hentAutentisering()?.token
 
     private fun hentClaimEllerSystemverdi(
