@@ -7,7 +7,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class DefaultAuditLoggerTest {
-    private val sporingsdata = Sporingsdata(AuditLoggerEvent.ACCESS, "12345678910")
+    private val sporingsdata = Sporingsdata(AuditLoggerEvent.READ, "12345678910")
 
     @Test
     fun `lager CEF-linje uten custom strings`() {
@@ -16,7 +16,7 @@ class DefaultAuditLoggerTest {
 
         // Assert
         assertThat(linje).isEqualTo(
-            "CEF:0|Familie|gravferd-sak|1.0|audit:access|Saksbehandling|INFO|" +
+            "CEF:0|Gravferd sak|gravferd-sak|1.0|audit:read|Sporingslogg|INFO|" +
                 "end=1767268800000 suid=Z123456 duid=12345678910 sproc=call-id requestMethod=PUT request=/api/behandling/42",
         )
     }
@@ -38,7 +38,7 @@ class DefaultAuditLoggerTest {
 
         // Assert
         assertThat(linje).isEqualTo(
-            "CEF:0|Familie|gravferd-sak|1.0|audit:update|Saksbehandling|INFO|" +
+            "CEF:0|Gravferd sak|gravferd-sak|1.0|audit:update|Sporingslogg|INFO|" +
                 "end=1767268800000 suid=Z123456 duid=12345678910 sproc=call-id requestMethod=PUT request=/api/behandling/42 " +
                 "cs3Label=fagsak cs3=7 cs5Label=behandling cs5=42 cs6Label=k3 cs6=v3",
         )
@@ -92,25 +92,14 @@ class DefaultAuditLoggerTest {
         assertThat(linje).contains(" suid=Z1\\=2 ", " sproc=a\\\\b ")
     }
 
-    @Test
-    fun `escaper pipe, backslash og linjeskift i header`() {
-        // Act
-        val linje = lagCefLinje(sporingsdata, applicationName = "app|med\\tegn\nog linjeskift")
-
-        // Assert
-        assertThat(linje).startsWith("CEF:0|Familie|app\\|med\\\\tegn og linjeskift|1.0|")
-    }
-
     private fun lagCefLinje(
         sporingsdata: Sporingsdata,
-        applicationName: String = "gravferd-sak",
         suid: String = "Z123456",
         callId: String = "call-id",
         requestUri: String = "/api/behandling/42",
     ): String =
         lagCefLinje(
             data = sporingsdata,
-            applicationName = applicationName,
             tidspunkt = 1767268800000,
             suid = suid,
             callId = callId,

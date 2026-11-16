@@ -9,14 +9,12 @@ import no.nav.gravferd.sak.kjerne.tilgang.AuditLogger
 import no.nav.gravferd.sak.kjerne.tilgang.Sporingsdata
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
 
 @Service
 class DefaultAuditLogger(
-    @param:Value("\${NAIS_APP_NAME}") private val applicationName: String,
     private val clockProvider: ClockProvider,
 ) : AuditLogger {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -45,7 +43,6 @@ class DefaultAuditLogger(
     ): String =
         lagCefLinje(
             data = data,
-            applicationName = applicationName,
             tidspunkt = clockProvider.get().millis(),
             suid = hentSaksbehandler(),
             callId = getCallId(),
@@ -62,16 +59,30 @@ class DefaultAuditLogger(
 
 internal fun lagCefLinje(
     data: Sporingsdata,
-    applicationName: String,
     tidspunkt: Long,
     suid: String,
     callId: String,
     requestMethod: String,
     requestUri: String,
 ): String {
+    val version = "0"
+    val deviceVendor = "Gravferd sak"
+    val deviceProduct = "gravferd-sak"
+    val deviceVersion = "1.0"
+    val deviceEventClassId = "audit:${data.event.type}"
+    val name = "Sporingslogg"
+    val severity = "INFO"
+
     val header =
-        listOf("CEF:0", "Familie", applicationName, "1.0", "audit:${data.event.type}", "Saksbehandling", "INFO")
-            .joinToString("|") { escapeHeader(it) }
+        listOf(
+            "CEF:$version",
+            deviceVendor,
+            deviceProduct,
+            deviceVersion,
+            deviceEventClassId,
+            name,
+            severity,
+        ).joinToString("|")
 
     val extension =
         listOfNotNull(
@@ -91,13 +102,6 @@ internal fun lagCefLinje(
 
     return "$header|$extension"
 }
-
-private fun escapeHeader(verdi: String): String =
-    verdi
-        .replace("\\", "\\\\")
-        .replace("|", "\\|")
-        .replace("\r", " ")
-        .replace("\n", " ")
 
 private fun escapeExtension(verdi: String): String =
     verdi

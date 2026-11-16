@@ -8,9 +8,9 @@ enum class AuditLoggerEvent(
     val type: String,
 ) {
     CREATE("create"),
+    READ("read"),
     UPDATE("update"),
     DELETE("delete"),
-    ACCESS("access"),
 }
 
 data class Sporingsdata(
