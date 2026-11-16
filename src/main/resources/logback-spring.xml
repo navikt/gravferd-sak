@@ -16,22 +16,22 @@
         </encoder>
     </appender>
 
+    <!-- additivity="false" hindrer at meldinger med personopplysninger også sendes til root-loggeren og stdout. -->
     <logger name="secureLogger" level="INFO" additivity="false">
         <appender-ref ref="team-logs"/>
     </logger>
 
-    <appender name="auditLogger" class="com.papertrailapp.logback.Syslog4jAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%m%n%xEx</pattern>
-        </layout>
-        <syslogConfig class="no.nav.gravferd.sak.config.auditlogg.AuditSyslogConfig">
-            <host>audit.nais</host>
-            <port>6514</port>
-            <ident>GRAVFERD-SAK</ident>
-            <maxMessageLength>128000</maxMessageLength>
-        </syslogConfig>
+    <!-- Oppslagslogg (ArcSight). Bruk: LoggerFactory.getLogger("auditLogger") -->
+    <appender name="auditLogger" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>audit.nais:6514</destination>
+        <writeBufferSize>128000</writeBufferSize>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!-- Prefikset identifiserer avsenderen. %nopex hindrer Logback i å legge til en stacktrace etter CEF-meldingen. -->
+            <pattern>${HOSTNAME} ${NAIS_APP_NAME}: %msg%n%nopex</pattern>
+        </encoder>
     </appender>
 
+    <!-- additivity="false" hindrer at auditmeldinger med personopplysninger også sendes til root-loggeren og stdout. -->
     <logger name="auditLogger" level="INFO" additivity="false">
         <appender-ref ref="auditLogger"/>
     </logger>
