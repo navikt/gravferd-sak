@@ -2,10 +2,15 @@ package no.nav.gravferd.sak.inn.rest.behandling
 
 import no.nav.gravferd.sak.fake.FakeBehandlingRepository
 import no.nav.gravferd.sak.fake.FakeFagsakRepository
+import no.nav.gravferd.sak.fake.FakeInnloggetBrukerService
 import no.nav.gravferd.sak.inn.rest.ApiExceptionHandler
 import no.nav.gravferd.sak.kjerne.behandling.BehandlingService
 import no.nav.gravferd.sak.kjerne.fagsak.FagsakService
+import no.nav.gravferd.sak.kjerne.tilgang.Rolle
+import no.nav.gravferd.sak.kjerne.tilgang.TilgangService
 import org.hamcrest.Matchers.containsInAnyOrder
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
@@ -19,14 +24,34 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 class BehandlingControllerTest {
     private val fagsakService = FagsakService(FakeFagsakRepository())
     private val behandlingService = BehandlingService(FakeBehandlingRepository(), fagsakService)
+    private val innloggetBrukerService = FakeInnloggetBrukerService()
+    private val tilgangService = TilgangService(innloggetBrukerService)
+    private val behandlingController = BehandlingController(behandlingService, tilgangService)
     private val mockMvc: MockMvc =
         MockMvcBuilders
-            .standaloneSetup(BehandlingController(behandlingService))
+            .standaloneSetup(behandlingController)
             .setControllerAdvice(ApiExceptionHandler())
             .build()
 
+    @BeforeEach
+    fun settRoller() = innloggetBrukerService.settRoller(Rolle.SAKSBEHANDLER)
+
+    @AfterEach
+    fun nullstill() = innloggetBrukerService.nullstill()
+
     @Nested
     inner class Opprett {
+        @Test
+        fun `gir 403 for veileder`() {
+            // Arrange
+            innloggetBrukerService.settRoller(Rolle.VEILEDER)
+
+            // Act & Assert
+            mockMvc
+                .perform(post("/api/behandling").contentType(MediaType.APPLICATION_JSON).content("""{"fagsakId": 1}"""))
+                .andExpect(status().isForbidden)
+        }
+
         @Test
         fun `gir 201 med behandlingen`() {
             // Arrange
@@ -72,6 +97,17 @@ class BehandlingControllerTest {
     @Nested
     inner class Hent {
         @Test
+        fun `gir 403 uten roller`() {
+            // Arrange
+            innloggetBrukerService.settRoller()
+
+            // Act & Assert
+            mockMvc
+                .perform(get("/api/behandling/1"))
+                .andExpect(status().isForbidden)
+        }
+
+        @Test
         fun `gir behandlingen`() {
             // Arrange
             val fagsak = fagsakService.opprett()
@@ -96,6 +132,17 @@ class BehandlingControllerTest {
 
     @Nested
     inner class HentForFagsak {
+        @Test
+        fun `gir 403 uten roller`() {
+            // Arrange
+            innloggetBrukerService.settRoller()
+
+            // Act & Assert
+            mockMvc
+                .perform(get("/api/behandling/fagsak/1"))
+                .andExpect(status().isForbidden)
+        }
+
         @Test
         fun `gir bare behandlingene til fagsaken`() {
             // Arrange

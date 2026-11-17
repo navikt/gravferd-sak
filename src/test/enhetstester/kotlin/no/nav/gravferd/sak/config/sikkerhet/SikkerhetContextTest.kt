@@ -153,4 +153,16 @@ class SikkerhetContextTest {
         // Assert
         assertThat(erMaskinTilMaskin).isFalse()
     }
+
+    @Test
+    fun `hentRoller gir alle rollene til innlogget bruker`() {
+        // Arrange
+        settSecurityHolderContext(roller = listOf(Rolle.SAKSBEHANDLER, Rolle.FORVALTER))
+
+        // Act
+        val roller = SikkerhetContext.hentRoller()
+
+        // Assert
+        assertThat(roller).containsExactlyInAnyOrder(Rolle.SAKSBEHANDLER, Rolle.FORVALTER)
+    }
 }

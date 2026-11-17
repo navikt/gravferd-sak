@@ -22,3 +22,8 @@ class IkkeFunnetFeil(
     melding: String,
     frontendFeilmelding: String = melding,
 ) : FunksjonellFeil(melding, frontendFeilmelding)
+
+class ManglerTilgangFeil(
+    melding: String,
+    frontendFeilmelding: String = melding,
+) : FunksjonellFeil(melding, frontendFeilmelding)

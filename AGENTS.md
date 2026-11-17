@@ -75,7 +75,9 @@ Skriv en kommentar ved annotasjonen om hvorfor testen ikke kan parallelliseres.
 
 - Tilgang styres av rolle (`Rolle`, `RolleProperties`) og populasjonstilgangskontroll (tilgangsmaskinen).
 - `Rolle` ligger i `kjerne/tilgang`. Mappingen fra Entra ID-grupper til roller ligger i `config/sikkerhet`. Endringer der gjennomgås som sikkerhetsendringer.
-- Kjernen leser aldri innlogget bruker selv. `inn` sender roller og ident inn som parametre.
+- Innlogget bruker leses via `SikkerhetContext` i `config/sikkerhet`. Kjernen henter innlogget bruker og roller via `InnloggetBrukerService` i `kjerne/tilgang`. Implementasjonen `DefaultInnloggetBrukerService` ligger i `config/implementasjon`.
+- Alle endepunkter kaller `TilgangService.validerHarTilgangTilHandling(minimumRolle, handling)` først. `ArkitekturTest` håndhever det. Manglende tilgang gir 403.
+- `Rolle` har et nivå, og en høyere rolle dekker en lavere. Unntaket er `FORVALTER`: der den kreves, slipper bare brukere med forvalterrollen inn. Forvalterrollen gir veiledertilgang.
 - Personopplysninger (fødselsnummer, navn, adresse, aktørId) skal aldri i vanlige logger, kun i secureLogger.
 
 ## Commits og PR

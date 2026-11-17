@@ -4,6 +4,7 @@ import no.nav.gravferd.sak.kjerne.feil.BaseFeil
 import no.nav.gravferd.sak.kjerne.feil.Feil
 import no.nav.gravferd.sak.kjerne.feil.FunksjonellFeil
 import no.nav.gravferd.sak.kjerne.feil.IkkeFunnetFeil
+import no.nav.gravferd.sak.kjerne.feil.ManglerTilgangFeil
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
@@ -18,6 +19,12 @@ class ApiExceptionHandler {
     fun håndterIkkeFunnet(feil: IkkeFunnetFeil): ProblemDetail {
         logger.info(feil.melding)
         return tilProblemDetail(HttpStatus.NOT_FOUND, feil)
+    }
+
+    @ExceptionHandler(ManglerTilgangFeil::class)
+    fun håndterManglerTilgang(feil: ManglerTilgangFeil): ProblemDetail {
+        logger.info(feil.melding)
+        return tilProblemDetail(HttpStatus.FORBIDDEN, feil)
     }
 
     @ExceptionHandler(FunksjonellFeil::class)
