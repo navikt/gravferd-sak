@@ -23,7 +23,10 @@ class TilgangService(
             }
 
         if (!harTilgang) {
-            throw ManglerTilgangFeil("Mangler tilgang til å $handling. Krever $minimumRolle, har $roller")
+            throw ManglerTilgangFeil(
+                melding = "Mangler tilgang til å $handling. Krever $minimumRolle, har $roller",
+                frontendFeilmelding = "Du har ikke tilgang til å gjøre denne handlingen.",
+            )
         }
     }
 }
