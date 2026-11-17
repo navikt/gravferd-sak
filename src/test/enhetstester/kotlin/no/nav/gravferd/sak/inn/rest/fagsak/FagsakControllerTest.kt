@@ -1,8 +1,13 @@
 package no.nav.gravferd.sak.inn.rest.fagsak
 
 import no.nav.gravferd.sak.fake.FakeFagsakRepository
+import no.nav.gravferd.sak.fake.FakeInnloggetBrukerService
 import no.nav.gravferd.sak.inn.rest.ApiExceptionHandler
 import no.nav.gravferd.sak.kjerne.fagsak.FagsakService
+import no.nav.gravferd.sak.kjerne.tilgang.Rolle
+import no.nav.gravferd.sak.kjerne.tilgang.TilgangService
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.test.web.servlet.MockMvc
@@ -14,14 +19,34 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 
 class FagsakControllerTest {
     private val fagsakService = FagsakService(FakeFagsakRepository())
+    private val innloggetBrukerService = FakeInnloggetBrukerService()
+    private val tilgangService = TilgangService(innloggetBrukerService)
+    private val fagsakController = FagsakController(fagsakService, tilgangService)
     private val mockMvc: MockMvc =
         MockMvcBuilders
-            .standaloneSetup(FagsakController(fagsakService))
+            .standaloneSetup(fagsakController)
             .setControllerAdvice(ApiExceptionHandler())
             .build()
 
+    @BeforeEach
+    fun settRoller() = innloggetBrukerService.settRoller(Rolle.SAKSBEHANDLER)
+
+    @AfterEach
+    fun nullstill() = innloggetBrukerService.nullstill()
+
     @Nested
     inner class Opprett {
+        @Test
+        fun `gir 403 for veileder`() {
+            // Arrange
+            innloggetBrukerService.settRoller(Rolle.VEILEDER)
+
+            // Act & Assert
+            mockMvc
+                .perform(post("/api/fagsak"))
+                .andExpect(status().isForbidden)
+        }
+
         @Test
         fun `gir 201 med fagsaken`() {
             // Act & Assert
@@ -39,6 +64,17 @@ class FagsakControllerTest {
 
     @Nested
     inner class Hent {
+        @Test
+        fun `gir 403 uten roller`() {
+            // Arrange
+            innloggetBrukerService.settRoller()
+
+            // Act & Assert
+            mockMvc
+                .perform(get("/api/fagsak/1"))
+                .andExpect(status().isForbidden)
+        }
+
         @Test
         fun `gir fagsaken`() {
             // Arrange

@@ -1,6 +1,9 @@
 package no.nav.gravferd.sak.inn.rest.behandling
 
 import no.nav.gravferd.sak.kjerne.behandling.BehandlingService
+import no.nav.gravferd.sak.kjerne.tilgang.Rolle.SAKSBEHANDLER
+import no.nav.gravferd.sak.kjerne.tilgang.Rolle.VEILEDER
+import no.nav.gravferd.sak.kjerne.tilgang.TilgangService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -14,20 +17,42 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/behandling")
 class BehandlingController(
     private val behandlingService: BehandlingService,
+    private val tilgangService: TilgangService,
 ) {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun opprett(
         @RequestBody request: OpprettBehandlingRequest,
-    ): BehandlingDto = behandlingService.opprett(request.fagsakId).tilDto()
+    ): BehandlingDto {
+        tilgangService.validerHarTilgangTilHandling(
+            minimumRolle = SAKSBEHANDLER,
+            handling = "opprette behandling",
+        )
+
+        return behandlingService.opprett(request.fagsakId).tilDto()
+    }
 
     @GetMapping("/{behandlingId}")
     fun hent(
         @PathVariable behandlingId: Long,
-    ): BehandlingDto = behandlingService.hent(behandlingId).tilDto()
+    ): BehandlingDto {
+        tilgangService.validerHarTilgangTilHandling(
+            minimumRolle = VEILEDER,
+            handling = "hente behandling",
+        )
+
+        return behandlingService.hent(behandlingId).tilDto()
+    }
 
     @GetMapping("/fagsak/{fagsakId}")
     fun hentForFagsak(
         @PathVariable fagsakId: Long,
-    ): List<BehandlingDto> = behandlingService.hentForFagsak(fagsakId).map { it.tilDto() }
+    ): List<BehandlingDto> {
+        tilgangService.validerHarTilgangTilHandling(
+            minimumRolle = VEILEDER,
+            handling = "hente behandlinger for fagsak",
+        )
+
+        return behandlingService.hentForFagsak(fagsakId).map { it.tilDto() }
+    }
 }

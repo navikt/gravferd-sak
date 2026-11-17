@@ -1,14 +1,21 @@
 package no.nav.gravferd.sak.arkitektur
 
 import com.tngtech.archunit.core.domain.JavaClasses
+import com.tngtech.archunit.core.domain.JavaMethod
 import com.tngtech.archunit.core.domain.properties.HasName.Predicates.name
 import com.tngtech.archunit.core.importer.ClassFileImporter
 import com.tngtech.archunit.core.importer.ImportOption
+import com.tngtech.archunit.lang.ArchCondition
+import com.tngtech.archunit.lang.ConditionEvents
+import com.tngtech.archunit.lang.SimpleConditionEvent
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes
+import com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses
 import com.tngtech.archunit.library.Architectures.layeredArchitecture
+import no.nav.gravferd.sak.kjerne.tilgang.TilgangService
 import org.junit.jupiter.api.Test
 import org.springframework.stereotype.Service
+import org.springframework.web.bind.annotation.RestController
 
 class ArkitekturTest {
     @Test
@@ -68,10 +75,35 @@ class ArkitekturTest {
             ).check(klasser)
     }
 
+    @Test
+    fun `alle endepunkter sjekker tilgang`() {
+        methods()
+            .that()
+            .areDeclaredInClassesThat()
+            .areAnnotatedWith(RestController::class.java)
+            .should(kalleTilgangssjekk())
+            .check(klasser)
+    }
+
     private companion object {
         const val ROT = "no.nav.gravferd.sak"
 
-        val klasser: JavaClasses by lazy {
+        private fun kalleTilgangssjekk(): ArchCondition<JavaMethod> =
+            object : ArchCondition<JavaMethod>("kalle TilgangService.validerHarTilgangTilHandling") {
+                override fun check(
+                    metode: JavaMethod,
+                    events: ConditionEvents,
+                ) {
+                    val kallerSjekk =
+                        metode.methodCallsFromSelf.any {
+                            it.targetOwner.isEquivalentTo(TilgangService::class.java) &&
+                                it.name == TilgangService::validerHarTilgangTilHandling.name
+                        }
+                    events.add(SimpleConditionEvent(metode, kallerSjekk, "${metode.fullName} kaller ikke tilgangssjekken"))
+                }
+            }
+
+        private val klasser: JavaClasses by lazy {
             ClassFileImporter()
                 .withImportOption(ImportOption.DoNotIncludeTests())
                 .importPackages(ROT)
