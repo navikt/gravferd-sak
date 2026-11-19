@@ -25,7 +25,7 @@
         <changelist>-SNAPSHOT</changelist>
         <felles.version>4.20261026180911_c3ff6d9</felles.version>
         <prosessering.version>2.20261102130928_50eba5f</prosessering.version>
-        <felles-kontrakter.version>4.0_20261116104124_cadda20</felles-kontrakter.version>
+        <felles-kontrakter.version>4.0_20261118131100_72bb819</felles-kontrakter.version>
         <logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
         <unleash.version>12.3.2</unleash.version>
         <ktlint.version>1.8.0</ktlint.version>
