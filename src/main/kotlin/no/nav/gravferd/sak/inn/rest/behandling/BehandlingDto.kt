@@ -17,9 +17,9 @@ fun Behandling.tilDto() =
     BehandlingDto(
         id = id,
         fagsakId = fagsakId,
-        versjon = versjon,
-        opprettetAv = opprettetAv,
-        opprettetTidspunkt = opprettetTidspunkt,
-        endretAv = endretAv,
-        endretTidspunkt = endretTidspunkt,
+        versjon = metadata.versjon,
+        opprettetAv = metadata.opprettetAv,
+        opprettetTidspunkt = metadata.opprettetTidspunkt,
+        endretAv = metadata.endretAv,
+        endretTidspunkt = metadata.endretTidspunkt,
     )

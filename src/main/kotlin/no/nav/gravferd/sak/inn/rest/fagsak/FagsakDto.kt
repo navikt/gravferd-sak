@@ -15,9 +15,9 @@ data class FagsakDto(
 fun Fagsak.tilDto() =
     FagsakDto(
         id = id,
-        versjon = versjon,
-        opprettetAv = opprettetAv,
-        opprettetTidspunkt = opprettetTidspunkt,
-        endretAv = endretAv,
-        endretTidspunkt = endretTidspunkt,
+        versjon = metadata.versjon,
+        opprettetAv = metadata.opprettetAv,
+        opprettetTidspunkt = metadata.opprettetTidspunkt,
+        endretAv = metadata.endretAv,
+        endretTidspunkt = metadata.endretTidspunkt,
     )

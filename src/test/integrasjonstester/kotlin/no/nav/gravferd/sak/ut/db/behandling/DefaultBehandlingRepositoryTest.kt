@@ -38,10 +38,10 @@ class DefaultBehandlingRepositoryTest : AbstractIntegrasjonstest() {
             // Assert
             assertThat(hentet).isEqualTo(behandling)
             assertThat(hentet?.fagsakId).isEqualTo(fagsak.id)
-            assertThat(hentet?.opprettetAv).isEqualTo("VL")
-            assertThat(hentet?.opprettetTidspunkt).isEqualTo(STANDARDTIDSPUNKT)
-            assertThat(hentet?.endretAv).isEqualTo("VL")
-            assertThat(hentet?.endretTidspunkt).isEqualTo(STANDARDTIDSPUNKT)
+            assertThat(hentet?.metadata?.opprettetAv).isEqualTo("VL")
+            assertThat(hentet?.metadata?.opprettetTidspunkt).isEqualTo(STANDARDTIDSPUNKT)
+            assertThat(hentet?.metadata?.endretAv).isEqualTo("VL")
+            assertThat(hentet?.metadata?.endretTidspunkt).isEqualTo(STANDARDTIDSPUNKT)
         }
 
         @Test
@@ -55,8 +55,8 @@ class DefaultBehandlingRepositoryTest : AbstractIntegrasjonstest() {
 
             // Assert
             val hentet = behandlingRepository.hent(behandling.id)
-            assertThat(hentet?.opprettetAv).isEqualTo(gyldigeClaims["NAVident"])
-            assertThat(hentet?.endretAv).isEqualTo(gyldigeClaims["NAVident"])
+            assertThat(hentet?.metadata?.opprettetAv).isEqualTo(gyldigeClaims["NAVident"])
+            assertThat(hentet?.metadata?.endretAv).isEqualTo(gyldigeClaims["NAVident"])
         }
 
         @Test

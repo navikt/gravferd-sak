@@ -2,6 +2,7 @@ package no.nav.gravferd.sak.fake
 
 import no.nav.gravferd.sak.kjerne.fagsak.Fagsak
 import no.nav.gravferd.sak.kjerne.fagsak.FagsakRepository
+import no.nav.gravferd.sak.kjerne.felles.Entitetsmetadata
 import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
@@ -14,11 +15,14 @@ class FakeFagsakRepository : FagsakRepository {
         val fagsak =
             Fagsak(
                 id = nesteId.getAndIncrement(),
-                versjon = 1,
-                opprettetAv = "VL",
-                opprettetTidspunkt = LocalDateTime.of(2026, 1, 1, 12, 0),
-                endretAv = "VL",
-                endretTidspunkt = LocalDateTime.of(2026, 1, 1, 12, 0),
+                metadata =
+                    Entitetsmetadata(
+                        versjon = 1,
+                        opprettetAv = "VL",
+                        opprettetTidspunkt = LocalDateTime.of(2026, 1, 1, 12, 0),
+                        endretAv = "VL",
+                        endretTidspunkt = LocalDateTime.of(2026, 1, 1, 12, 0),
+                    ),
             )
         fagsaker[fagsak.id] = fagsak
         return fagsak

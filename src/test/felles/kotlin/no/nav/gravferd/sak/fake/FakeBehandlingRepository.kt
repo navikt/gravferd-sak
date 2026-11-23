@@ -2,6 +2,7 @@ package no.nav.gravferd.sak.fake
 
 import no.nav.gravferd.sak.kjerne.behandling.Behandling
 import no.nav.gravferd.sak.kjerne.behandling.BehandlingRepository
+import no.nav.gravferd.sak.kjerne.felles.Entitetsmetadata
 import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
@@ -15,11 +16,14 @@ class FakeBehandlingRepository : BehandlingRepository {
             Behandling(
                 id = nesteId.getAndIncrement(),
                 fagsakId = fagsakId,
-                versjon = 1,
-                opprettetAv = "VL",
-                opprettetTidspunkt = LocalDateTime.of(2026, 1, 1, 12, 0),
-                endretAv = "VL",
-                endretTidspunkt = LocalDateTime.of(2026, 1, 1, 12, 0),
+                metadata =
+                    Entitetsmetadata(
+                        versjon = 1,
+                        opprettetAv = "VL",
+                        opprettetTidspunkt = LocalDateTime.of(2026, 1, 1, 12, 0),
+                        endretAv = "VL",
+                        endretTidspunkt = LocalDateTime.of(2026, 1, 1, 12, 0),
+                    ),
             )
         behandlinger[behandling.id] = behandling
         return behandling
