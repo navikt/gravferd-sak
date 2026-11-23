@@ -54,11 +54,11 @@ class FagsakControllerTest {
                 .perform(post("/api/fagsak"))
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$.id").isNumber)
-                .andExpect(jsonPath("$.versjon").value(1))
-                .andExpect(jsonPath("$.opprettetAv").value("VL"))
-                .andExpect(jsonPath("$.opprettetTidspunkt").value("2026-01-01T12:00:00"))
-                .andExpect(jsonPath("$.endretAv").value("VL"))
-                .andExpect(jsonPath("$.endretTidspunkt").value("2026-01-01T12:00:00"))
+                .andExpect(jsonPath("$.metadata.versjon").value(1))
+                .andExpect(jsonPath("$.metadata.opprettetAv").value("VL"))
+                .andExpect(jsonPath("$.metadata.opprettetTidspunkt").value("2026-01-01T12:00:00"))
+                .andExpect(jsonPath("$.metadata.endretAv").value("VL"))
+                .andExpect(jsonPath("$.metadata.endretTidspunkt").value("2026-01-01T12:00:00"))
         }
     }
 

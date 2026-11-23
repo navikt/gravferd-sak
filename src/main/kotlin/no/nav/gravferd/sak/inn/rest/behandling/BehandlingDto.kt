@@ -1,25 +1,18 @@
 package no.nav.gravferd.sak.inn.rest.behandling
 
+import no.nav.gravferd.sak.inn.rest.EntitetsmetadataDto
+import no.nav.gravferd.sak.inn.rest.tilDto
 import no.nav.gravferd.sak.kjerne.behandling.Behandling
-import java.time.LocalDateTime
 
 data class BehandlingDto(
     val id: Long,
     val fagsakId: Long,
-    val versjon: Long,
-    val opprettetAv: String,
-    val opprettetTidspunkt: LocalDateTime,
-    val endretAv: String?,
-    val endretTidspunkt: LocalDateTime?,
+    val metadata: EntitetsmetadataDto,
 )
 
 fun Behandling.tilDto() =
     BehandlingDto(
         id = id,
         fagsakId = fagsakId,
-        versjon = metadata.versjon,
-        opprettetAv = metadata.opprettetAv,
-        opprettetTidspunkt = metadata.opprettetTidspunkt,
-        endretAv = metadata.endretAv,
-        endretTidspunkt = metadata.endretTidspunkt,
+        metadata = metadata.tilDto(),
     )
