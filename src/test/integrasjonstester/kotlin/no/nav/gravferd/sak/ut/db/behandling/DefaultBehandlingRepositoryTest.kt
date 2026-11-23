@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.security.core.context.SecurityContextHolder
 
 class DefaultBehandlingRepositoryTest : AbstractIntegrasjonstest() {
@@ -109,6 +110,92 @@ class DefaultBehandlingRepositoryTest : AbstractIntegrasjonstest() {
 
             // Assert
             assertThat(hentet).isNull()
+        }
+    }
+
+    @Nested
+    inner class Oppdater {
+        @Test
+        fun `skal oppdatere endretAv, endretTidspunkt og versjon, men beholde opprettetAv og opprettetTidspunkt`() {
+            // Arrange
+            SecurityContextHolder.clearContext()
+            val fagsak = fagsakRepository.opprett()
+            val opprettet = behandlingRepository.opprett(fagsak.id)
+            val nyttTidspunkt = STANDARDTIDSPUNKT.plusDays(1)
+            fakeClockProvider.settTid(nyttTidspunkt)
+            settSecurityHolderContext(claims = gyldigeClaims + ("NAVident" to "Z654321"))
+
+            // Act
+            val oppdatert = behandlingRepository.oppdater(opprettet)
+            val hentet = behandlingRepository.hent(opprettet.id)
+
+            // Assert
+            assertThat(opprettet.metadata.opprettetAv).isEqualTo("VL")
+            assertThat(opprettet.metadata.opprettetTidspunkt).isEqualTo(STANDARDTIDSPUNKT)
+            assertThat(oppdatert.id).isEqualTo(opprettet.id)
+            assertThat(oppdatert.fagsakId).isEqualTo(opprettet.fagsakId)
+            assertThat(oppdatert.metadata.versjon).isEqualTo(opprettet.metadata.versjon + 1)
+            assertThat(oppdatert.metadata.opprettetAv).isEqualTo(opprettet.metadata.opprettetAv)
+            assertThat(oppdatert.metadata.opprettetTidspunkt).isEqualTo(opprettet.metadata.opprettetTidspunkt)
+            assertThat(oppdatert.metadata.endretAv).isEqualTo("Z654321")
+            assertThat(oppdatert.metadata.endretTidspunkt).isEqualTo(nyttTidspunkt)
+            assertThat(hentet).isEqualTo(oppdatert)
+        }
+
+        @Test
+        fun `skal avvise oppdatering med utdatert versjon uten å endre lagret behandling`() {
+            // Arrange
+            val fagsak = fagsakRepository.opprett()
+            val opprinnelig = behandlingRepository.opprett(fagsak.id)
+            val gjeldende = behandlingRepository.oppdater(opprinnelig)
+
+            // Act
+            val feil = catchThrowable { behandlingRepository.oppdater(opprinnelig) }
+            val hentet = behandlingRepository.hent(opprinnelig.id)
+
+            // Assert
+            assertThat(feil).isInstanceOf(OptimisticLockingFailureException::class.java)
+            assertThat(hentet).isEqualTo(gjeldende)
+        }
+
+        @Test
+        fun `skal avvise oppdatering av ukjent id`() {
+            // Arrange
+            val fagsak = fagsakRepository.opprett()
+            val opprettet = behandlingRepository.opprett(fagsak.id)
+
+            // Act
+            val feil =
+                catchThrowable {
+                    behandlingRepository.oppdater(opprettet.copy(id = Long.MAX_VALUE))
+                }
+
+            // Assert
+            assertThat(feil).isInstanceOf(OptimisticLockingFailureException::class.java)
+        }
+
+        @Test
+        fun `skal ikke overskrive opprettetAv og opprettetTidspunkt ved oppdatering selv om de er forsøkt endret`() {
+            // Arrange
+            SecurityContextHolder.clearContext()
+            val fagsak = fagsakRepository.opprett()
+            val opprettet = behandlingRepository.opprett(fagsak.id)
+            val endretOpprettingsinformasjon =
+                opprettet.copy(
+                    metadata =
+                        opprettet.metadata.copy(
+                            opprettetAv = "annen bruker",
+                            opprettetTidspunkt = STANDARDTIDSPUNKT.plusDays(2),
+                        ),
+                )
+
+            // Act
+            behandlingRepository.oppdater(endretOpprettingsinformasjon)
+            val hentet = behandlingRepository.hent(opprettet.id)
+
+            // Assert
+            assertThat(hentet?.metadata?.opprettetAv).isEqualTo(opprettet.metadata.opprettetAv)
+            assertThat(hentet?.metadata?.opprettetTidspunkt).isEqualTo(opprettet.metadata.opprettetTidspunkt)
         }
     }
 }

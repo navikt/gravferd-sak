@@ -17,6 +17,8 @@ class DefaultBehandlingRepository(
     BehandlingRepository {
     override fun opprett(fagsakId: Long): Behandling = opprettDbo(BehandlingDbo(fagsakId = fagsakId)).tilDomene()
 
+    override fun oppdater(behandling: Behandling): Behandling = oppdaterDbo(BehandlingDboMapper.tilDbo(behandling)).tilDomene()
+
     override fun hent(id: Long): Behandling? = hentDbo(id)?.tilDomene()
 
     override fun hentForFagsak(fagsakId: Long): List<Behandling> =

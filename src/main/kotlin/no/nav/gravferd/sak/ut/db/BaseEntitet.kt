@@ -6,14 +6,17 @@ import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.annotation.Version
 import org.springframework.data.relational.core.mapping.Column
+import org.springframework.data.relational.core.mapping.InsertOnlyProperty
 import java.time.LocalDateTime
 
 abstract class BaseEntitet {
     @CreatedBy
+    @InsertOnlyProperty
     @Column("opprettet_av")
     var opprettetAv: String? = null
 
     @CreatedDate
+    @InsertOnlyProperty
     @Column("opprettet_tidspunkt")
     var opprettetTidspunkt: LocalDateTime? = null
 

@@ -14,6 +14,8 @@ class DefaultFagsakRepository(
     FagsakRepository {
     override fun opprett(): Fagsak = opprettDbo(FagsakDbo()).tilDomene()
 
+    override fun oppdater(fagsak: Fagsak): Fagsak = oppdaterDbo(FagsakDboMapper.tilDbo(fagsak)).tilDomene()
+
     override fun hent(id: Long): Fagsak? = hentDbo(id)?.tilDomene()
 
     private fun FagsakDbo.tilDomene() =
