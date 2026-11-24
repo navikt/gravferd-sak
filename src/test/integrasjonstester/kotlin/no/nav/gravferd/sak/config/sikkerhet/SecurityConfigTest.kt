@@ -1,91 +1,24 @@
 package no.nav.gravferd.sak.config.sikkerhet
 
-import jakarta.servlet.Filter
-import no.nav.gravferd.sak.config.sikkerhet.TestRolleProperties.rolleProperties
+import no.nav.gravferd.sak.AbstractIntegrasjonstest
 import no.nav.gravferd.sak.config.sikkerhet.TestTokenServer.token
+import no.nav.gravferd.sak.ut.db.fagsak.DefaultFagsakRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.startsWith
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Import
-import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.context.WebApplicationContext
-import org.springframework.web.servlet.config.annotation.EnableWebMvc
 
-@Tag("integration")
-@SpringJUnitWebConfig(SecurityConfigTest.TestConfig::class)
-class SecurityConfigTest {
-    @Configuration
-    @EnableWebMvc
-    @Import(
-        TestTokenServerConfig::class,
-        SecurityConfig::class,
-        AzureAdAuthenticationManager::class,
-        AzureAdJwtAuthenticationConverter::class,
-        TestController::class,
-    )
-    class TestConfig {
-        @Bean
-        fun rolleProperties() = rolleProperties
-    }
-
-    @RestController
-    class TestController {
-        @GetMapping(
-            "/internal/health/liveness",
-            "/internal/info",
-            "/internal/prometheus",
-            "/internal/annet",
-            "/v3/api-docs/test",
-            "/swagger-ui/index.html",
-            "/swagger-ui.html",
-            "/api/test",
-        )
-        fun get() = "ok"
-
-        @PostMapping("/api/test")
-        fun post() = "ok"
-
-        @PreAuthorize("hasRole('BESLUTTER')")
-        @GetMapping("/api/beslutter")
-        fun beslutter() = "ok"
-    }
-
-    @Autowired
-    private lateinit var context: WebApplicationContext
-
-    @Autowired
-    @Qualifier("springSecurityFilterChain")
-    private lateinit var springSecurityFilterChain: Filter
-
-    private lateinit var mockMvc: MockMvc
-
-    @BeforeEach
-    fun setup() {
-        mockMvc =
-            MockMvcBuilders
-                .webAppContextSetup(context)
-                .addFilters<DefaultMockMvcBuilder>(springSecurityFilterChain)
-                .build()
-    }
+class SecurityConfigTest(
+    @Autowired fagsakRepository: DefaultFagsakRepository,
+    @Autowired private val rolleProperties: RolleProperties,
+) : AbstractIntegrasjonstest() {
+    private val fagsakId = fagsakRepository.opprett().id
 
     @ParameterizedTest
     @ValueSource(
@@ -93,7 +26,7 @@ class SecurityConfigTest {
             "/internal/health/liveness",
             "/internal/info",
             "/internal/prometheus",
-            "/v3/api-docs/test",
+            "/v3/api-docs",
             "/swagger-ui/index.html",
             "/swagger-ui.html",
         ],
@@ -101,13 +34,13 @@ class SecurityConfigTest {
     fun `åpne endepunkter krever ikke token`(sti: String) {
         mockMvc
             .perform(get(sti))
-            .andExpect(status().isOk)
+            .andExpect { assertThat(it.response.status).isNotIn(401, 403) }
     }
 
     @Test
     fun `beskyttet endepunkt uten token gir 401`() {
         mockMvc
-            .perform(get("/api/test"))
+            .perform(get("/api/fagsak/$fagsakId"))
             .andExpect(status().isUnauthorized)
             .andExpect(header().string("WWW-Authenticate", startsWith("Bearer")))
     }
@@ -126,7 +59,7 @@ class SecurityConfigTest {
 
         // Act & Assert
         mockMvc
-            .perform(get("/api/test").header("Authorization", "Bearer $token"))
+            .perform(get("/api/fagsak/$fagsakId").header("Authorization", "Bearer $token"))
             .andExpect(status().isUnauthorized)
     }
 
@@ -138,7 +71,7 @@ class SecurityConfigTest {
 
         // Act & Assert
         mockMvc
-            .perform(get("/api/test").header("Authorization", "Bearer $token"))
+            .perform(get("/api/fagsak/$fagsakId").header("Authorization", "Bearer $token"))
             .andExpect(status().isOk)
     }
 
@@ -149,7 +82,7 @@ class SecurityConfigTest {
 
         // Act & Assert
         mockMvc
-            .perform(get("/api/test").header("Authorization", "Bearer $token"))
+            .perform(get("/api/fagsak/$fagsakId").header("Authorization", "Bearer $token"))
             .andExpect(status().isForbidden)
     }
 
@@ -160,7 +93,7 @@ class SecurityConfigTest {
 
         // Act & Assert
         mockMvc
-            .perform(get("/api/test").header("Authorization", "Bearer $token"))
+            .perform(get("/api/fagsak/$fagsakId").header("Authorization", "Bearer $token"))
             .andExpect(status().isForbidden)
     }
 
@@ -171,7 +104,7 @@ class SecurityConfigTest {
 
         // Act & Assert
         mockMvc
-            .perform(get("/api/test").header("Authorization", "Bearer $token"))
+            .perform(get("/api/fagsak/$fagsakId").header("Authorization", "Bearer $token"))
             .andExpect(status().isForbidden)
     }
 
@@ -182,7 +115,7 @@ class SecurityConfigTest {
 
         // Act & Assert
         mockMvc
-            .perform(get("/api/test").header("Authorization", "Bearer $token"))
+            .perform(get("/api/fagsak/$fagsakId").header("Authorization", "Bearer $token"))
             .andExpect(status().isForbidden)
     }
 
@@ -193,19 +126,19 @@ class SecurityConfigTest {
 
         // Act & Assert
         mockMvc
-            .perform(get("/api/test").header("Authorization", "Bearer $token"))
+            .perform(get("/api/fagsak/$fagsakId").header("Authorization", "Bearer $token"))
             .andExpect(status().isOk)
     }
 
     @Test
-    fun `post med gyldig token gir 200 uten csrf-token`() {
+    fun `post med gyldig token gir 201 uten csrf-token`() {
         // Arrange
         val token = token(grupper = listOf(rolleProperties.saksbehandler))
 
         // Act & Assert
         mockMvc
-            .perform(post("/api/test").header("Authorization", "Bearer $token"))
-            .andExpect(status().isOk)
+            .perform(post("/api/fagsak").header("Authorization", "Bearer $token"))
+            .andExpect(status().isCreated)
     }
 
     @Test
@@ -215,7 +148,7 @@ class SecurityConfigTest {
 
         // Act & Assert
         mockMvc
-            .perform(post("/api/test").header("Authorization", "Bearer $token"))
+            .perform(post("/api/fagsak").header("Authorization", "Bearer $token"))
             .andExpect(status().isForbidden)
     }
 
@@ -226,38 +159,42 @@ class SecurityConfigTest {
 
         // Act & Assert
         mockMvc
-            .perform(get("/api/test").header("Authorization", "Bearer $token"))
+            .perform(get("/api/fagsak/$fagsakId").header("Authorization", "Bearer $token"))
             .andExpect(status().isOk)
             .andExpect { assertThat(it.request.getSession(false)).isNull() }
 
         mockMvc
-            .perform(get("/api/test"))
+            .perform(get("/api/fagsak/$fagsakId"))
             .andExpect(status().isUnauthorized)
     }
 
     @Test
     fun `oppretter ikke sesjon ved avvist kall`() {
         mockMvc
-            .perform(get("/api/test"))
+            .perform(get("/api/fagsak/$fagsakId"))
             .andExpect(status().isUnauthorized)
             .andExpect { assertThat(it.request.getSession(false)).isNull() }
     }
 
     @Test
-    fun `PreAuthorize avviser bruker uten påkrevd rolle`() {
+    fun `endepunkt avviser bruker med lavere rolle enn minimumsrollen`() {
+        // Arrange
         val token = token(grupper = listOf(rolleProperties.veileder))
 
+        // Act & Assert
         mockMvc
-            .perform(get("/api/beslutter").header("Authorization", "Bearer $token"))
+            .perform(post("/api/fagsak").header("Authorization", "Bearer $token"))
             .andExpect(status().isForbidden)
     }
 
     @Test
-    fun `PreAuthorize slipper inn bruker med påkrevd rolle`() {
+    fun `endepunkt slipper inn bruker med høyere rolle enn minimumsrollen`() {
+        // Arrange
         val token = token(grupper = listOf(rolleProperties.beslutter))
 
+        // Act & Assert
         mockMvc
-            .perform(get("/api/beslutter").header("Authorization", "Bearer $token"))
-            .andExpect(status().isOk)
+            .perform(post("/api/fagsak").header("Authorization", "Bearer $token"))
+            .andExpect(status().isCreated)
     }
 }
