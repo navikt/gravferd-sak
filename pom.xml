@@ -35,8 +35,8 @@
         <sonar.tests>src/test</sonar.tests>
         <sonar.projectKey>navikt_gravferd-sak</sonar.projectKey>
         <springdoc.version>3.2.0</springdoc.version>
-        <sonar-maven-plugin.version>5.8.0.7211</sonar-maven-plugin.version>
-        <mock-oauth2-server.version>7.0.0</mock-oauth2-server.version>
+        <sonar-maven-plugin.version>5.9.0.7382</sonar-maven-plugin.version>
+        <mock-oauth2-server.version>7.0.1</mock-oauth2-server.version>
         <mockk.version>1.14.12</mockk.version>
         <kotlinx-kover.version>0.9.11</kotlinx-kover.version>
         <archunit.version>1.5.1</archunit.version>
