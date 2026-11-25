@@ -23,3 +23,5 @@ updates:
       workflows:
         patterns:
           - "*"
+    ignore:
+      - dependency-name: "github/gh-aw-actions/*"
