@@ -1,0 +1,15 @@
+query HentPersonopplysninger($ident: ID!) {
+  person: hentPerson(ident: $ident) {
+    navn(historikk: false) {
+      fornavn
+      mellomnavn
+      etternavn
+    }
+    foedselsdato {
+      foedselsdato
+    }
+    doedsfall {
+      doedsdato
+    }
+  }
+}

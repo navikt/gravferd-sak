@@ -23,7 +23,8 @@
         <revision>1</revision>
         <sha1/>
         <changelist>-SNAPSHOT</changelist>
-        <felles.version>4.20261026180911_c3ff6d9</felles.version>
+        <felles.version>4.20261125133723_a8841ff</felles.version>
+        <graphql-kotlin.version>11.0.0</graphql-kotlin.version>
         <prosessering.version>2.20261102130928_50eba5f</prosessering.version>
         <felles-kontrakter.version>4.0_20261122100524_f432e73</felles-kontrakter.version>
         <logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
@@ -142,6 +143,16 @@
         <dependency>
             <groupId>no.nav.familie.felles</groupId>
             <artifactId>token-klient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.familie.felles</groupId>
+            <artifactId>pdl-klient</artifactId>
+        </dependency>
+        <dependency>
+            <!-- Runtime-typer som de genererte PDL-klassene refererer til -->
+            <groupId>com.expediagroup</groupId>
+            <artifactId>graphql-kotlin-client</artifactId>
+            <version>${graphql-kotlin.version}</version>
         </dependency>
         <dependency>
             <groupId>no.nav.familie.felles</groupId>
@@ -294,6 +305,26 @@
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <!-- Genererer PDL-DTO-er fra spørringene i src/main/resources/pdl, validert mot PDL-skjemaet -->
+                <groupId>com.expediagroup</groupId>
+                <artifactId>graphql-kotlin-maven-plugin</artifactId>
+                <version>${graphql-kotlin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate-client</goal>
+                        </goals>
+                        <configuration>
+                            <packageName>no.nav.gravferd.sak.ut.rest.pdl.dto</packageName>
+                            <schemaFile>${project.basedir}/src/main/resources/pdl/pdl-api-schema.graphql</schemaFile>
+                            <queryFiles>
+                                <queryFile>${project.basedir}/src/main/resources/pdl/hent-personopplysninger.graphql</queryFile>
+                            </queryFiles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <!-- Pakker appen som kjørbar jar med alle avhengigheter -->
                 <groupId>org.springframework.boot</groupId>
