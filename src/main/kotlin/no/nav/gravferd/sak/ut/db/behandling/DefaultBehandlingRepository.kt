@@ -3,7 +3,6 @@ package no.nav.gravferd.sak.ut.db.behandling
 import no.nav.gravferd.sak.kjerne.behandling.Behandling
 import no.nav.gravferd.sak.kjerne.behandling.BehandlingRepository
 import no.nav.gravferd.sak.ut.db.DboRepository
-import no.nav.gravferd.sak.ut.db.tilMetadata
 import org.springframework.data.jdbc.core.JdbcAggregateOperations
 import org.springframework.data.relational.core.query.Criteria
 import org.springframework.data.relational.core.query.Query

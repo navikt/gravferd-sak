@@ -1,15 +1,15 @@
-package no.nav.gravferd.sak.ut.db
+package no.nav.gravferd.sak.kjerne.felles
 
-import no.nav.gravferd.sak.kjerne.felles.Entitetsmetadata
 import no.nav.gravferd.sak.ut.db.fagsak.FagsakDbo
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
-class EntitetsmetadataMapperTest {
+class EntitetsmetadataTest {
     @Test
-    fun `tilMetadata kopierer alle metadatafeltene`() {
+    fun `tilMetadata overfører alle metadatafeltene`() {
+        // Arrange
         val opprettetTidspunkt = LocalDateTime.of(2026, 5, 6, 7, 8, 9)
         val endretTidspunkt = LocalDateTime.of(2026, 6, 7, 8, 9, 10)
         val dbo =
@@ -21,8 +21,10 @@ class EntitetsmetadataMapperTest {
                 this.endretTidspunkt = endretTidspunkt
             }
 
+        // Act
         val metadata = dbo.tilMetadata()
 
+        // Assert
         assertThat(metadata.versjon).isEqualTo(3)
         assertThat(metadata.opprettetAv).isEqualTo("oppretter")
         assertThat(metadata.opprettetTidspunkt).isEqualTo(opprettetTidspunkt)
@@ -31,7 +33,8 @@ class EntitetsmetadataMapperTest {
     }
 
     @Test
-    fun `tilMetadata beholder null i endretAv og endretTidspunkt`() {
+    fun `tilMetadata bevarer null i endretAv og endretTidspunkt`() {
+        // Arrange
         val opprettetTidspunkt = LocalDateTime.of(2026, 5, 6, 7, 8, 9)
         val dbo =
             FagsakDbo(id = 1).apply {
@@ -40,8 +43,10 @@ class EntitetsmetadataMapperTest {
                 this.opprettetTidspunkt = opprettetTidspunkt
             }
 
+        // Act
         val metadata = dbo.tilMetadata()
 
+        // Assert
         assertThat(metadata.versjon).isEqualTo(3)
         assertThat(metadata.opprettetAv).isEqualTo("oppretter")
         assertThat(metadata.opprettetTidspunkt).isEqualTo(opprettetTidspunkt)
@@ -51,13 +56,16 @@ class EntitetsmetadataMapperTest {
 
     @Test
     fun `tilMetadata avviser manglende opprettetAv`() {
+        // Arrange
         val dbo =
             FagsakDbo(id = 1).apply {
                 opprettetTidspunkt = LocalDateTime.of(2026, 5, 6, 7, 8, 9)
             }
 
+        // Act
         val feil = catchThrowable { dbo.tilMetadata() }
 
+        // Assert
         assertThat(feil)
             .isInstanceOf(IllegalStateException::class.java)
             .hasMessage("Entiteten mangler opprettetAv")
@@ -65,44 +73,15 @@ class EntitetsmetadataMapperTest {
 
     @Test
     fun `tilMetadata avviser manglende opprettetTidspunkt`() {
+        // Arrange
         val dbo = FagsakDbo(id = 1).apply { opprettetAv = "oppretter" }
 
+        // Act
         val feil = catchThrowable { dbo.tilMetadata() }
 
+        // Assert
         assertThat(feil)
             .isInstanceOf(IllegalStateException::class.java)
             .hasMessage("Entiteten mangler opprettetTidspunkt")
-    }
-
-    @Test
-    fun `medMetadata overfører versjon og opprettingsfelter uten å endre endringsmetadata`() {
-        val eksisterendeEndretTidspunkt = LocalDateTime.of(2026, 7, 8, 9, 10, 11)
-        val opprettetTidspunkt = LocalDateTime.of(2026, 1, 2, 3, 4, 5)
-        val metadataEndretTidspunkt = LocalDateTime.of(2026, 2, 3, 4, 5, 6)
-        val dbo =
-            FagsakDbo(id = 1).apply {
-                versjon = 1
-                opprettetAv = "gammel oppretter"
-                this.opprettetTidspunkt = LocalDateTime.of(2025, 1, 2, 3, 4, 5)
-                endretAv = "eksisterende endrer"
-                endretTidspunkt = eksisterendeEndretTidspunkt
-            }
-        val metadata =
-            Entitetsmetadata(
-                versjon = 8,
-                opprettetAv = "ny oppretter",
-                opprettetTidspunkt = opprettetTidspunkt,
-                endretAv = "metadata endrer",
-                endretTidspunkt = metadataEndretTidspunkt,
-            )
-
-        val resultat = dbo.medMetadata(metadata)
-
-        assertThat(resultat).isSameAs(dbo)
-        assertThat(dbo.versjon).isEqualTo(8)
-        assertThat(dbo.opprettetAv).isEqualTo("ny oppretter")
-        assertThat(dbo.opprettetTidspunkt).isEqualTo(opprettetTidspunkt)
-        assertThat(dbo.endretAv).isEqualTo("eksisterende endrer")
-        assertThat(dbo.endretTidspunkt).isEqualTo(eksisterendeEndretTidspunkt)
     }
 }

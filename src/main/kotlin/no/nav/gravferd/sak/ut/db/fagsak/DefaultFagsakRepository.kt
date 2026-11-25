@@ -3,7 +3,6 @@ package no.nav.gravferd.sak.ut.db.fagsak
 import no.nav.gravferd.sak.kjerne.fagsak.Fagsak
 import no.nav.gravferd.sak.kjerne.fagsak.FagsakRepository
 import no.nav.gravferd.sak.ut.db.DboRepository
-import no.nav.gravferd.sak.ut.db.tilMetadata
 import org.springframework.data.jdbc.core.JdbcAggregateOperations
 import org.springframework.stereotype.Repository
 

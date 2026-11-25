@@ -1,5 +1,6 @@
 package no.nav.gravferd.sak.ut.db
 
+import no.nav.gravferd.sak.kjerne.felles.Entitetsmetadata
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedBy
@@ -31,4 +32,19 @@ abstract class BaseEntitet {
     @Version
     @Column("versjon")
     var versjon: Long = 0
+
+    fun tilMetadata(): Entitetsmetadata =
+        Entitetsmetadata(
+            versjon = versjon,
+            opprettetAv =
+                checkNotNull(opprettetAv) {
+                    "Entiteten mangler opprettetAv"
+                },
+            opprettetTidspunkt =
+                checkNotNull(opprettetTidspunkt) {
+                    "Entiteten mangler opprettetTidspunkt"
+                },
+            endretAv = endretAv,
+            endretTidspunkt = endretTidspunkt,
+        )
 }
