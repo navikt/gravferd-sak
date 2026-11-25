@@ -28,3 +28,10 @@ TILGANGSMASKIN_SCOPE: dummy
 
 AUTHORIZATION_URL: http://localhost/authorize
 TOKEN_URL: http://localhost/token
+
+familie:
+  felles:
+    klient:
+      pdl:
+        url: https://pdl.test
+        scope: api://test.pdl.pdl-api/.default

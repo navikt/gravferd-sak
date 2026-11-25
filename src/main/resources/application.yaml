@@ -51,3 +51,9 @@ springdoc:
     disable-swagger-default-url: true
 
 API_SCOPE: api://${AZURE_APP_CLIENT_ID}/.default
+
+familie:
+  felles:
+    klient:
+      pdl:
+        behandlingsnummer: B299
