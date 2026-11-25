@@ -21,4 +21,9 @@ class FakeConfig {
     @Primary
     @Profile("mock-feature-toggle")
     fun fakeFeatureToggleService(): FakeFeatureToggleService = FakeFeatureToggleService()
+
+    @Bean
+    @Primary
+    @Profile("mock-pdl")
+    fun fakePdlService(): FakePdlService = FakePdlService()
 }
