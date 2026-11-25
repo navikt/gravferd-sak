@@ -2,6 +2,7 @@ package no.nav.gravferd.sak
 
 import no.nav.gravferd.sak.fake.FakeClockProvider
 import no.nav.gravferd.sak.fake.FakeFeatureToggleService
+import no.nav.gravferd.sak.fake.FakePdlService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Tag
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc
     "mock-leader-client",
     "mock-clock-provider",
     "mock-feature-toggle",
+    "mock-pdl",
 )
 @Tag("integration")
 abstract class AbstractIntegrasjonstest {
@@ -29,9 +31,13 @@ abstract class AbstractIntegrasjonstest {
     @Autowired
     protected lateinit var fakeFeatureToggleService: FakeFeatureToggleService
 
+    @Autowired
+    protected lateinit var fakePdlService: FakePdlService
+
     @AfterEach
     fun nullstillFakes() {
         fakeClockProvider.nullstill()
         fakeFeatureToggleService.nullstill()
+        fakePdlService.nullstill()
     }
 }
