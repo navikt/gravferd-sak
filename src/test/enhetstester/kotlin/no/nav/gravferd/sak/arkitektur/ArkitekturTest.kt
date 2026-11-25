@@ -49,6 +49,17 @@ class ArkitekturTest {
     }
 
     @Test
+    fun `bare pdl-adapter avhenger av pdl-klient`() {
+        noClasses()
+            .that()
+            .resideOutsideOfPackages("$ROT.ut.rest.pdl..")
+            .should()
+            .dependOnClassesThat()
+            .resideInAnyPackage("no.nav.familie.pdl..")
+            .check(klasser)
+    }
+
+    @Test
     fun `inn og ut inneholder ikke servicer`() {
         noClasses()
             .that()
