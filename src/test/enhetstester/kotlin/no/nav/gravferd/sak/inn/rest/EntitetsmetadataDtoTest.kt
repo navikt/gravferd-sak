@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 
 class EntitetsmetadataDtoTest {
     @Test
-    fun `tilDto overfører alle metadatafeltene`() {
+    fun `fraDomene overfører alle metadatafeltene`() {
         // Arrange
         val opprettetTidspunkt = LocalDateTime.of(2026, 11, 23, 10, 15)
         val endretTidspunkt = LocalDateTime.of(2026, 11, 23, 11, 30)
@@ -21,7 +21,7 @@ class EntitetsmetadataDtoTest {
             )
 
         // Act
-        val dto = metadata.tilDto()
+        val dto = EntitetsmetadataDto.fraDomene(metadata)
 
         // Assert
         assertThat(dto.versjon).isEqualTo(7L)
@@ -32,7 +32,7 @@ class EntitetsmetadataDtoTest {
     }
 
     @Test
-    fun `tilDto bevarer null i endringsfeltene`() {
+    fun `fraDomene bevarer null i endringsfeltene`() {
         // Arrange
         val opprettetTidspunkt = LocalDateTime.of(2026, 11, 23, 10, 15)
         val metadata =
@@ -45,7 +45,7 @@ class EntitetsmetadataDtoTest {
             )
 
         // Act
-        val dto = metadata.tilDto()
+        val dto = EntitetsmetadataDto.fraDomene(metadata)
 
         // Assert
         assertThat(dto.endretAv).isNull()

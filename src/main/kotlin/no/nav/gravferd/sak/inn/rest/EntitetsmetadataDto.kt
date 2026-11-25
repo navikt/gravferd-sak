@@ -9,13 +9,15 @@ data class EntitetsmetadataDto(
     val opprettetTidspunkt: LocalDateTime,
     val endretAv: String?,
     val endretTidspunkt: LocalDateTime?,
-)
-
-fun Entitetsmetadata.tilDto() =
-    EntitetsmetadataDto(
-        versjon = versjon,
-        opprettetAv = opprettetAv,
-        opprettetTidspunkt = opprettetTidspunkt,
-        endretAv = endretAv,
-        endretTidspunkt = endretTidspunkt,
-    )
+) {
+    companion object {
+        fun fraDomene(entitetsmetadata: Entitetsmetadata): EntitetsmetadataDto =
+            EntitetsmetadataDto(
+                versjon = entitetsmetadata.versjon,
+                opprettetAv = entitetsmetadata.opprettetAv,
+                opprettetTidspunkt = entitetsmetadata.opprettetTidspunkt,
+                endretAv = entitetsmetadata.endretAv,
+                endretTidspunkt = entitetsmetadata.endretTidspunkt,
+            )
+    }
+}
