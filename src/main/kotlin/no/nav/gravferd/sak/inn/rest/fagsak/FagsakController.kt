@@ -26,7 +26,7 @@ class FagsakController(
             handling = "opprette fagsak",
         )
 
-        return fagsakService.opprett().tilDto()
+        return FagsakDto.fraDomene(fagsakService.opprett())
     }
 
     @GetMapping("/{fagsakId}")
@@ -38,6 +38,6 @@ class FagsakController(
             handling = "hente fagsak",
         )
 
-        return fagsakService.hent(fagsakId).tilDto()
+        return FagsakDto.fraDomene(fagsakService.hent(fagsakId))
     }
 }

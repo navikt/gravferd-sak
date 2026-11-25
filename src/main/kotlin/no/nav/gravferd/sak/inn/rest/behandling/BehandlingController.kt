@@ -29,7 +29,7 @@ class BehandlingController(
             handling = "opprette behandling",
         )
 
-        return behandlingService.opprett(request.fagsakId).tilDto()
+        return BehandlingDto.fraDomene(behandlingService.opprett(request.fagsakId))
     }
 
     @GetMapping("/{behandlingId}")
@@ -41,7 +41,7 @@ class BehandlingController(
             handling = "hente behandling",
         )
 
-        return behandlingService.hent(behandlingId).tilDto()
+        return BehandlingDto.fraDomene(behandlingService.hent(behandlingId))
     }
 
     @GetMapping("/fagsak/{fagsakId}")
@@ -53,6 +53,6 @@ class BehandlingController(
             handling = "hente behandlinger for fagsak",
         )
 
-        return behandlingService.hentForFagsak(fagsakId).map { it.tilDto() }
+        return behandlingService.hentForFagsak(fagsakId).map { BehandlingDto.fraDomene(it) }
     }
 }
