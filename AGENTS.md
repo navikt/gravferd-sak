@@ -50,6 +50,10 @@ Testene er delt i fire kildemapper:
 - `src/test/felles`: fakes og testoppsett som deles
 - `src/test/lokal`: launchere for lokal kjøring, ikke tester
 
+- Grupper tester av hver metode i en egen `@Nested inner class`.
+- Navngi den indre klassen etter metoden med stor forbokstav, for eksempel `FraDomene` for `fraDomene()`.
+- La testnavnene beskrive oppførselen uten å gjenta metodenavnet som prefiks. Bruk for eksempel `overfører alle metadatafeltene`, ikke `fraDomene overfører alle metadatafeltene`.
+
 Alle tester skal kunne kjøres parallelt. Det betyr:
 
 - Ingen delt, muterbar tilstand mellom tester (statiske felt, singleton-fakes, felles databaserader).
