@@ -1,28 +1,27 @@
-package no.nav.gravferd.sak.kjerne.felles
+package no.nav.gravferd.sak.ut.db
 
-import no.nav.gravferd.sak.ut.db.fagsak.FagsakDbo
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
-class EntitetsmetadataTest {
+class BaseEntitetTest {
     @Test
     fun `tilMetadata overfører alle metadatafeltene`() {
         // Arrange
         val opprettetTidspunkt = LocalDateTime.of(2026, 5, 6, 7, 8, 9)
         val endretTidspunkt = LocalDateTime.of(2026, 6, 7, 8, 9, 10)
-        val dbo =
-            FagsakDbo(id = 1).apply {
-                versjon = 3
-                opprettetAv = "oppretter"
-                this.opprettetTidspunkt = opprettetTidspunkt
-                endretAv = "endrer"
-                this.endretTidspunkt = endretTidspunkt
-            }
+        val entitet = object : BaseEntitet() {}
+        entitet.apply {
+            versjon = 3
+            opprettetAv = "oppretter"
+            this.opprettetTidspunkt = opprettetTidspunkt
+            endretAv = "endrer"
+            this.endretTidspunkt = endretTidspunkt
+        }
 
         // Act
-        val metadata = dbo.tilMetadata()
+        val metadata = entitet.tilMetadata()
 
         // Assert
         assertThat(metadata.versjon).isEqualTo(3)
@@ -36,15 +35,15 @@ class EntitetsmetadataTest {
     fun `tilMetadata bevarer null i endretAv og endretTidspunkt`() {
         // Arrange
         val opprettetTidspunkt = LocalDateTime.of(2026, 5, 6, 7, 8, 9)
-        val dbo =
-            FagsakDbo(id = 1).apply {
-                versjon = 3
-                opprettetAv = "oppretter"
-                this.opprettetTidspunkt = opprettetTidspunkt
-            }
+        val entitet = object : BaseEntitet() {}
+        entitet.apply {
+            versjon = 3
+            opprettetAv = "oppretter"
+            this.opprettetTidspunkt = opprettetTidspunkt
+        }
 
         // Act
-        val metadata = dbo.tilMetadata()
+        val metadata = entitet.tilMetadata()
 
         // Assert
         assertThat(metadata.versjon).isEqualTo(3)
@@ -57,13 +56,11 @@ class EntitetsmetadataTest {
     @Test
     fun `tilMetadata avviser manglende opprettetAv`() {
         // Arrange
-        val dbo =
-            FagsakDbo(id = 1).apply {
-                opprettetTidspunkt = LocalDateTime.of(2026, 5, 6, 7, 8, 9)
-            }
+        val entitet = object : BaseEntitet() {}
+        entitet.opprettetTidspunkt = LocalDateTime.of(2026, 5, 6, 7, 8, 9)
 
         // Act
-        val feil = catchThrowable { dbo.tilMetadata() }
+        val feil = catchThrowable { entitet.tilMetadata() }
 
         // Assert
         assertThat(feil)
@@ -74,10 +71,11 @@ class EntitetsmetadataTest {
     @Test
     fun `tilMetadata avviser manglende opprettetTidspunkt`() {
         // Arrange
-        val dbo = FagsakDbo(id = 1).apply { opprettetAv = "oppretter" }
+        val entitet = object : BaseEntitet() {}
+        entitet.opprettetAv = "oppretter"
 
         // Act
-        val feil = catchThrowable { dbo.tilMetadata() }
+        val feil = catchThrowable { entitet.tilMetadata() }
 
         // Assert
         assertThat(feil)

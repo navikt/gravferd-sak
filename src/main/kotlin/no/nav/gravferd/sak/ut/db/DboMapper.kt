@@ -8,13 +8,14 @@ abstract class DboMapper<D : HarEntitetsmetadata, T : BaseEntitet> {
 
     protected abstract fun lagDboUtenMetadata(domene: D): T
 
-    // Viktig at versjon, opprettetAv og opprettetTidspunkt settes ved oppdatering av dbo.
-    // Versjon trengs for å verifisere at det ikke er gjort endringer på entiteten etter at den ble hentet.
-    // opprettetAv og opprettetTidspunkt vil ved oppdatering returnere null dersom de ikke sendes inn.
+    // Alle metadatafeltene kopieres med forventet versjon uendret.
+    // Auditing setter ny endringsbruker og nytt endringstidspunkt ved lagring.
     private fun T.medMetadata(metadata: Entitetsmetadata): T =
         apply {
             versjon = metadata.versjon
             opprettetAv = metadata.opprettetAv
             opprettetTidspunkt = metadata.opprettetTidspunkt
+            endretAv = metadata.endretAv
+            endretTidspunkt = metadata.endretTidspunkt
         }
 }
