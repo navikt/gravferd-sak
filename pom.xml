@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.2</version>
+        <version>4.2.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -23,7 +23,7 @@
         <revision>1</revision>
         <sha1/>
         <changelist>-SNAPSHOT</changelist>
-        <felles.version>4.20261026180911_c3ff6d9</felles.version>
+        <felles.version>4.20261126091617_7f51c20</felles.version>
         <prosessering.version>2.20261102130928_50eba5f</prosessering.version>
         <felles-kontrakter.version>4.0_20261122100524_f432e73</felles-kontrakter.version>
         <logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
