@@ -74,6 +74,7 @@ spec:
           cluster: dev-gcp
       external:
         - host: gravferd-unleash-api.nav.cloud.nais.io
+        - host: pdl-api.dev-fss-pub.nais.io
   replicas:
     min: 1
     max: 1
